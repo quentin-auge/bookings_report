@@ -1,8 +1,9 @@
 from typing import TextIO
 
-from sqlalchemy import Table
 from sqlalchemy.engine import Engine
+from sqlalchemy.ext.declarative import declarative_base
 
+MappedTable = declarative_base()
 
 def build_psql_uri(host: str, port: str, user: str, pwd: str, db: str) -> str:
     """
@@ -11,7 +12,7 @@ def build_psql_uri(host: str, port: str, user: str, pwd: str, db: str) -> str:
     return f'postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{db}'
 
 
-def load_from_csv(stream: TextIO, table: Table, engine: Engine):
+def load_from_csv(stream: TextIO, table: MappedTable, engine: Engine):
     """
     Efficiently load a CSV to a PostgreSQL table.
 
@@ -33,7 +34,7 @@ def load_from_csv(stream: TextIO, table: Table, engine: Engine):
     cursor.close()
 
 
-def unload_to_csv(table: Table, stream: TextIO, engine: Engine):
+def unload_to_csv(table: MappedTable, stream: TextIO, engine: Engine):
     """
     Efficiently unload a PostgreSQL table to a stream.
 

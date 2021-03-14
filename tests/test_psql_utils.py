@@ -6,11 +6,11 @@ from io import StringIO
 import pytest
 import sqlalchemy
 import yaml
-from sqlalchemy import Column, Date, Integer, String, Table, create_engine
+from sqlalchemy import Column, Date, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 
-from bookings_report.psql_utils import build_psql_uri, load_from_csv, unload_to_csv
+from bookings_report.psql_utils import MappedTable, build_psql_uri, load_from_csv, unload_to_csv
 
 
 @pytest.fixture(scope='module')
@@ -46,7 +46,7 @@ def fake_csv() -> str:
 
 
 @pytest.fixture
-def table(engine) -> Table:
+def table(engine) -> MappedTable:
     Base = declarative_base()
 
     class TestTable(Base):
