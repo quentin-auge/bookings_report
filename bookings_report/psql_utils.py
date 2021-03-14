@@ -1,9 +1,13 @@
+import logging
 from typing import TextIO
 
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 
+SQLALCHEMY_LOGGER = logging.getLogger('sqlalchemy.engine')
+
 MappedTable = declarative_base()
+
 
 def build_psql_uri(host: str, port: str, user: str, pwd: str, db: str) -> str:
     """
@@ -28,6 +32,9 @@ def load_from_csv(stream: TextIO, table: MappedTable, engine: Engine):
     cursor = connection.cursor()
 
     copy_query = f'COPY {table.__tablename__} FROM STDIN WITH (FORMAT CSV, HEADER TRUE)'
+    # For some reason, `cursor.copy_expert()` does not feel like logging anything
+    SQLALCHEMY_LOGGER.info(copy_query)
+
     cursor.copy_expert(copy_query, stream)
 
     connection.commit()
@@ -50,6 +57,9 @@ def unload_to_csv(table: MappedTable, stream: TextIO, engine: Engine):
     cursor = connection.cursor()
 
     copy_query = f'COPY {table.__tablename__} TO STDOUT WITH CSV HEADER'
+    # For some reason, `cursor.copy_expert()` does not feel like logging anything
+    SQLALCHEMY_LOGGER.info(copy_query)
+
     cursor.copy_expert(copy_query, stream)
 
     connection.commit()
