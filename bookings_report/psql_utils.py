@@ -4,7 +4,7 @@ from sqlalchemy import Table
 from sqlalchemy.engine import Engine
 
 
-def build_psql_url(host: str, port: str, user: str, pwd: str, db: str) -> str:
+def build_psql_uri(host: str, port: str, user: str, pwd: str, db: str) -> str:
     """
     Generate a PostgreSQL connection URL.
     """
