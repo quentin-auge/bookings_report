@@ -1,6 +1,8 @@
+from datetime import date
+
 import pytest
 
-from bookings_report.transform import parse_amount_and_currency
+from bookings_report.transform import parse_amount_and_currency, parse_date
 
 
 @pytest.mark.parametrize('raw_amount, expected', [
@@ -27,7 +29,7 @@ def test_parse_amount_and_currency(raw_amount, expected):
 ])
 def test_fail_parse_currency(raw_amount):
     with pytest.raises(NotImplementedError, match='unrecognized currency'):
-        print('parseed =', parse_amount_and_currency(raw_amount))
+        print('parsed =', parse_amount_and_currency(raw_amount))
 
 
 @pytest.mark.parametrize('raw_amount', [
@@ -37,4 +39,22 @@ def test_fail_parse_currency(raw_amount):
 ])
 def test_fail_parse_amount(raw_amount):
     with pytest.raises(NotImplementedError, match='unrecognized amount'):
-        print('parseed =', parse_amount_and_currency(raw_amount))
+        print('parsed =', parse_amount_and_currency(raw_amount))
+
+
+@pytest.mark.parametrize('raw_date', [
+    pytest.param('21-03-2015', id='dash_date'),
+    pytest.param('21/03/2015', id='slash_date')
+])
+def test_parse_date(raw_date):
+    assert parse_date(raw_date) == date(2015, 3, 21)
+
+
+@pytest.mark.parametrize('raw_date', [
+    pytest.param('03-21-2015', id='dash_date'),
+    pytest.param('2015/03/21', id='slash_date'),
+    pytest.param('21_03_2015', id='underscore_date')
+])
+def test_fail_parse_date(raw_date):
+    with pytest.raises(NotImplementedError, match='Cannot parse date'):
+        print('parsed =', parse_date(raw_date))
