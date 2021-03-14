@@ -1,0 +1,7 @@
+.coverage
+.idea/
+.tox/
+.venv/
+__pycache__/
+bookings_report.egg-info/
+out/
