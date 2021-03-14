@@ -1,0 +1,5 @@
+host: 'localhost'
+port: 54321
+user: 'docker'
+pwd: '%N2GV*#dFKws7S'
+db: 'db'

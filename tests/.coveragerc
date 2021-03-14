@@ -1,0 +1,11 @@
+[run]
+
+branch = True
+
+omit =
+    */__init__.py
+    */cli.py
+
+[report]
+
+sort = Cover

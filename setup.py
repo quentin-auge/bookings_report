@@ -16,7 +16,7 @@ setup(name='bookings-report',
                    'Operating System :: MacOS',
                    'Operating System :: Unix'],
 
-      install_requires=['sqlalchemy', 'psycopg2-binary'],
+      install_requires=['sqlalchemy', 'psycopg2-binary', 'pyyaml'],
 
       extras_require={
           'testing': ['coverage', 'pytest', 'pytest-cov']
