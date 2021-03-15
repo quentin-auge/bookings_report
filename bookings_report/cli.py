@@ -7,9 +7,12 @@ from io import StringIO
 import sqlalchemy
 import yaml
 
-from bookings_report.psql_utils import build_psql_uri, load_from_csv
-from bookings_report.tables import get_bookings_table
+from bookings_report.aggregate import aggregate_report
+from bookings_report.psql_utils import build_psql_uri, load_from_csv, unload_to_csv
+from bookings_report.tables import get_bookings_table, get_report_table
 from bookings_report.transform import parse_amount_and_currency, parse_date
+
+LOGGER = logging.getLogger(__name__)
 
 
 def main():
@@ -45,7 +48,7 @@ def main():
 
     bookings_table = get_bookings_table('bookings')
 
-    # Drop table if it already exists
+    # Drop bookings table if it already exists
     bookings_table.__table__.drop(bind=engine, checkfirst=True)
     bookings_table.__table__.create(bind=engine)
     # Schedule drop table at end of script
@@ -72,6 +75,22 @@ def main():
 
     # Load booking rows into the database
     load_from_csv(stream, bookings_table, engine)
+
+    # Access report table
+
+    report_table = get_report_table('monthly_restaurant_report')
+
+    # Create report table if it does not exist
+    report_table.__table__.create(bind=engine, checkfirst=True)
+
+    # Perform report aggregation
+    aggregate_report(bookings_table, report_table, engine)
+
+    # Export to CSV
+
+    with open(args.out, 'w') as f:
+        LOGGER.info(f'Writing report to {args.out}')
+        unload_to_csv(report_table, f, engine)
 
 
 if __name__ == '__main__':
