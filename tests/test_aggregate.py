@@ -24,7 +24,7 @@ def bookings_table(engine) -> MappedTable:
     try:
         yield table
     finally:
-        table.__table__.drop(bind=engine)
+        table.__table__.drop(bind=engine, checkfirst=True)
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def report_table(engine) -> MappedTable:
 
 def _fill_bookings_table(bookings_table: MappedTable, rows: List[Dict[str, Any]],
                          engine: Engine):
-    Session = sessionmaker(bind=engine, checkfirst=True)
+    Session = sessionmaker(bind=engine)
     session = Session()
 
     try:
