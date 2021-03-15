@@ -2,6 +2,7 @@ import uuid
 from datetime import date
 from typing import Any, Dict, List
 
+import pytest
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -12,27 +13,39 @@ from bookings_report.tables import get_bookings_table, get_report_table
 MappedTable = declarative_base()
 
 
-def _create_test_bookings_table(rows: List[Dict[str, Any]], engine: Engine) -> MappedTable:
-    TestBookings = get_bookings_table(table_name='test_bookings_{}'.format(str(uuid.uuid4())[-10:]))
-    TestBookings.__table__.create(bind=engine, checkfirst=True)
+@pytest.fixture
+def bookings_table(engine) -> MappedTable:
+    table = get_bookings_table('test_bookings_{}'.format(str(uuid.uuid4())[-10:]))
+    table.__table__.create(bind=engine, checkfirst=True)
 
+    try:
+        yield table
+    finally:
+        table.__table__.drop(bind=engine)
+
+
+@pytest.fixture
+def report_table(engine) -> MappedTable:
+    table = get_report_table('test_report_{}'.format(str(uuid.uuid4())[-10:]))
+    table.__table__.create(bind=engine, checkfirst=True)
+
+    try:
+        yield table
+    finally:
+        table.__table__.drop(bind=engine)
+
+
+def _fill_bookings_table(bookings_table: MappedTable, rows: List[Dict[str, Any]],
+                         engine: Engine):
     Session = sessionmaker(bind=engine)
     session = Session()
 
     for row in rows:
         row = _transform_test_booking_row(row)
-        booking = TestBookings(**row)
+        booking = bookings_table(**row)
         session.add(booking)
 
     session.commit()
-
-    return TestBookings
-
-
-def _create_test_report_table(engine: Engine) -> MappedTable:
-    TestReport = get_report_table(table_name='test_report_{}'.format(str(uuid.uuid4())[-10:]))
-    TestReport.__table__.create(bind=engine, checkfirst=True)
-    return TestReport
 
 
 def _transform_test_booking_row(row: Dict[str, Any]) -> Dict[str, Any]:
@@ -70,16 +83,20 @@ def _query_report_rows(report_table: MappedTable, engine: Engine) -> List[Dict[s
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    rows = []
-    for row in session.query(report_table).all():
-        row = row.__dict__
-        row.pop('_sa_instance_state', None)
-        rows.append(row)
+    try:
+        rows = []
+        for row in session.query(report_table).all():
+            row = row.__dict__
+            row.pop('_sa_instance_state', None)
+            rows.append(row)
+    finally:
+        session.close()
+
     return rows
 
 
-def test_aggregate_report(engine):
-    # Create and fill a bookings table
+def test_aggregate_report(engine: Engine, bookings_table: MappedTable, report_table: MappedTable):
+    # Fill a bookings table
 
     booking_rows = [
         # Restaurant 1, month 1
@@ -148,12 +165,11 @@ def test_aggregate_report(engine):
         }
     ]
 
-    TestBookings = _create_test_bookings_table(booking_rows, engine)
+    _fill_bookings_table(bookings_table, booking_rows, engine)
 
-    # Create and fill report table
+    # Aggregate into report table
 
-    TestReport = _create_test_report_table(engine)
-    aggregate_report(TestBookings, TestReport, engine)
+    aggregate_report(bookings_table, report_table, engine)
 
     # Create expected report rows
 
@@ -199,7 +215,7 @@ def test_aggregate_report(engine):
 
     # Query actual report rows
 
-    actual_report_rows = _query_report_rows(TestReport, engine)
+    actual_report_rows = _query_report_rows(report_table, engine)
 
     # Sort results (using primary keys) to allow for list equality test
 

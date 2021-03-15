@@ -7,7 +7,6 @@ from io import StringIO
 import sqlalchemy
 import yaml
 
-from bookings_report.aggregate import aggregate_report
 from bookings_report.psql_utils import build_psql_uri, load_from_csv
 from bookings_report.tables import get_bookings_table
 from bookings_report.transform import parse_amount_and_currency, parse_date
@@ -73,6 +72,7 @@ def main():
 
     # Load booking rows into the database
     load_from_csv(stream, Bookings, engine)
+
 
 if __name__ == '__main__':
     main()
