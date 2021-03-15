@@ -19,7 +19,7 @@ setup(name='bookings-report',
       install_requires=['sqlalchemy', 'psycopg2-binary', 'pyyaml'],
 
       extras_require={
-          'testing': ['coverage', 'pytest', 'pytest-cov']
+          'testing': ['coverage', 'mock', 'pytest', 'pytest-cov']
       },
 
       entry_points={

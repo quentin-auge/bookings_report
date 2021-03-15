@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.ext.declarative import declarative_base
 
 MappedTable = declarative_base()
@@ -20,22 +20,20 @@ def aggregate_report(bookings_table: MappedTable, report_table: MappedTable, eng
 
     with engine.begin() as connection:
         # Truncate already-existing report table
-        truncate_query = _build_truncate_query(report_table)
-        connection.execute(truncate_query)
+        _run_truncate_query(report_table, connection)
 
         # Recreate report
-        agg_query = _build_aggregate_report_query(bookings_table, report_table)
-        connection.execute(agg_query)
+        _run_aggregate_report_query(bookings_table, report_table, connection)
 
 
-def _build_truncate_query(table: MappedTable) -> sqlalchemy.Text:
-    truncate_query = f'TRUNCATE TABLE {table.__tablename__}'
-    return sqlalchemy.text(truncate_query)
+def _run_truncate_query(table: MappedTable, connection: Connection) -> sqlalchemy.Text:
+    truncate_query = sqlalchemy.text(f'TRUNCATE TABLE {table.__tablename__}')
+    connection.execute(truncate_query)
 
 
-def _build_aggregate_report_query(bookings_table: MappedTable, report_table: MappedTable
-                                  ) -> sqlalchemy.Text:
-    agg_query = f'''
+def _run_aggregate_report_query(bookings_table: MappedTable, report_table: MappedTable,
+                                connection: Connection):
+    agg_query = sqlalchemy.text(f'''
     INSERT INTO {report_table.__tablename__}
         WITH report AS
         (
@@ -71,6 +69,6 @@ def _build_aggregate_report_query(bookings_table: MappedTable, report_table: Map
                     NULL
             END AS amount
         FROM report
-    '''
+    ''')
 
-    return sqlalchemy.text(agg_query)
+    connection.execute(agg_query)

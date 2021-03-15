@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, Integer, Numeric, String
+from sqlalchemy import Column, Date, Integer, Numeric, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -39,6 +39,7 @@ def get_report_table(table_name: str) -> MappedTable:
 
     class Report(MappedTable):
         __tablename__ = table_name
+
         restaurant_id = Column(UUID, nullable=False, primary_key=True)
         restaurant_name = Column(String, nullable=False)
         country = Column(String, nullable=False)

@@ -4,7 +4,6 @@ from io import StringIO
 
 import pytest
 from sqlalchemy import Column, Date, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
 
 from bookings_report.psql_utils import MappedTable, build_psql_uri, load_from_csv, unload_to_csv
 
