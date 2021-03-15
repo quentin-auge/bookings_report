@@ -20,8 +20,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Generate a monthly restaurant bookings report')
     parser.add_argument('bookings_file', help='input CSV bookings')
-    parser.add_argument('--out', '-o', metavar='report_file', required=True,
-                        help='output CSV report')
+    parser.add_argument('--out', '-o', metavar='report_file', help='output CSV report')
     parser.add_argument('--conf', metavar='psql_conf', default='conf/psql.yaml',
                         help='YAML database configuration (default: %(default)s)')
     parser.add_argument('--verbose', '-v', action='store_true', help='verbose logging')
@@ -88,9 +87,10 @@ def main():
 
     # Export to CSV
 
-    with open(args.out, 'w') as f:
-        LOGGER.info(f'Writing report to {args.out}')
-        unload_to_csv(report_table, f, engine)
+    if args.out:
+        with open(args.out, 'w') as f:
+            LOGGER.info(f'Writing report to {args.out}')
+            unload_to_csv(report_table, f, engine)
 
 
 if __name__ == '__main__':
