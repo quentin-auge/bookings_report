@@ -9,11 +9,11 @@ from bookings_report.transform import parse_amount_and_currency, parse_date
     pytest.param('12,34€', (12.34, '€'), id='euro_comma'),
     pytest.param('56.78€', (56.78, '€'), id='euro_dot'),
     pytest.param('123€', (123, '€'), id='euro_int'),
-    pytest.param('   12,54   € ', (12.54, '€'), id='spaces'),
+    pytest.param('  12,54   €  ', (12.54, '€'), id='spaces'),
     pytest.param('£12.34', (12.34, '£'), id='pounds_dot'),
     pytest.param('£56.78', (56.78, '£'), id='pounds_comma'),
     pytest.param('£123', (123, '£'), id='pounds_int'),
-    pytest.param(' £  56.78   ', (56.78, '£'), id='pounds_spaces')
+    pytest.param(' £  56.78   ', (56.78, '£'), id='pounds_spaces')
 ])
 def test_parse_amount_and_currency(raw_amount, expected):
     assert parse_amount_and_currency(raw_amount) == expected
