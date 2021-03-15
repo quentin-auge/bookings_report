@@ -15,7 +15,8 @@ MappedTable = declarative_base()
 
 @pytest.fixture
 def bookings_table(engine) -> MappedTable:
-    table = get_bookings_table('test_bookings_{}'.format(str(uuid.uuid4())[-10:]))
+    random_id = str(uuid.uuid4())[-10:]
+    table = get_bookings_table(f'bookings_{random_id}')
     table.__table__.create(bind=engine, checkfirst=True)
 
     try:
@@ -26,7 +27,8 @@ def bookings_table(engine) -> MappedTable:
 
 @pytest.fixture
 def report_table(engine) -> MappedTable:
-    table = get_report_table('test_report_{}'.format(str(uuid.uuid4())[-10:]))
+    random_id = str(uuid.uuid4())[-10:]
+    table = get_report_table(f'monthly_restaurant_report_{random_id}')
     table.__table__.create(bind=engine, checkfirst=True)
 
     try:

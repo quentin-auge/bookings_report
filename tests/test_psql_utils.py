@@ -22,10 +22,10 @@ def fake_csv() -> str:
 
 @pytest.fixture
 def table(engine) -> MappedTable:
-    Base = declarative_base()
+    random_id = str(uuid.uuid4())[-10:]
 
-    class TestTable(Base):
-        __tablename__ = 'test_table_{}'.format(str(uuid.uuid4())[-10:])
+    class TestTable(MappedTable):
+        __tablename__ = f'table_{random_id}'
         a = Column(Integer, primary_key=True)
         b = Column(String)
         c = Column(Date)

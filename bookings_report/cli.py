@@ -19,7 +19,7 @@ def main():
     parser.add_argument('bookings_file', help='input CSV bookings')
     parser.add_argument('--out', '-o', metavar='report_file', required=True,
                         help='output CSV report')
-    parser.add_argument('--conf', metavar='psql_conf', default='conf.yaml',
+    parser.add_argument('--conf', metavar='psql_conf', default='conf/psql.yaml',
                         help='YAML database configuration (default: %(default)s)')
     parser.add_argument('--verbose', '-v', action='store_true', help='verbose logging')
     args = parser.parse_args()
@@ -43,16 +43,16 @@ def main():
 
     # Create bookings table (temporary table)
 
-    Bookings = get_bookings_table('bookings')
+    bookings_table = get_bookings_table('bookings')
 
     # Drop table if it already exists
-    Bookings.__table__.drop(bind=engine, checkfirst=True)
-    Bookings.__table__.create(bind=engine)
+    bookings_table.__table__.drop(bind=engine, checkfirst=True)
+    bookings_table.__table__.create(bind=engine)
     # Schedule drop table at end of script
-    atexit.register(lambda: Bookings.__table__.drop(bind=engine, checkfirst=True))
+    atexit.register(lambda: bookings_table.__table__.drop(bind=engine, checkfirst=True))
 
     # Retrieve bookings table column names
-    columns = [c.key for c in Bookings.__table__.columns]
+    columns = [c.key for c in bookings_table.__table__.columns]
 
     # Extract data from booking file
 
@@ -71,7 +71,7 @@ def main():
             writer.writerow(row)
 
     # Load booking rows into the database
-    load_from_csv(stream, Bookings, engine)
+    load_from_csv(stream, bookings_table, engine)
 
 
 if __name__ == '__main__':

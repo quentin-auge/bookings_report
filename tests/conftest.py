@@ -9,7 +9,7 @@ from sqlalchemy.engine import Engine
 
 @pytest.fixture(scope='session')
 def engine() -> Engine:
-    with open(os.path.join(os.path.dirname(__file__), '..', 'conf.yaml')) as f:
+    with open(os.path.join(os.path.dirname(__file__), '..', 'conf', 'psql.yaml')) as f:
         conf = yaml.safe_load(f)
 
     # Connect to the database
