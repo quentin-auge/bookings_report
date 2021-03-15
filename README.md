@@ -21,7 +21,7 @@ $ docker pull postgres
 
 * Run it
 ```
-$ docker run -e POSTGRES_USER=docker -e POSTGRES_PASSD='%N2GV*#dFKws7S' -e POSTGRES_DB=db -p 54321:5432 postgres
+$ docker run -e POSTGRES_USER=docker -e POSTGRES_PASSWORD='%N2GV*#dFKws7S' -e POSTGRES_DB=db -p 54321:5432 postgres
 ```
 
 ### Project
