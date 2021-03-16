@@ -2,8 +2,11 @@
 
 Generate a monthly restaurant bookings report.
 
-The code runs with Python >= 3.6. It is a locally pip-installable python package connecting to a (
-dockerized) PostgreSQL instance using `sqlalchemy`, exposing a `bookings-report` command line tool.
+The code runs with Python >= 3.6. It is a locally pip-installable python package connecting to a
+(dockerized) PostgreSQL instance using `sqlalchemy`, exposing a `bookings-report` command line tool.
+
+A justification of design decisions and suggestions of further improvements is available in
+[design.md](design.md).
 
 It is tested using `tox` and `pytest` with 100% code coverage (excluding the main).
 
